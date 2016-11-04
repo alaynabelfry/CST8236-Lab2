@@ -1,0 +1,5 @@
+﻿  main.cpp
+c:\users\alayn\documents\github\cst8236-lab2\template\main.cpp(96): warning C4838: conversion from 'double' to 'GLfloat' requires a narrowing conversion
+c:\users\alayn\documents\github\cst8236-lab2\template\main.cpp(96): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+  Template.vcxproj -> C:\Users\alayn\Documents\GitHub\CST8236-Lab2\Debug\CST8236Lab2.exe
+  Template.vcxproj -> C:\Users\alayn\Documents\GitHub\CST8236-Lab2\Debug\CST8236Lab2.pdb (Full PDB)
