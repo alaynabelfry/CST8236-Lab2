@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube(GLuint textureID) : _horizontalAngle(0), _verticalAngle(0), _textureID(textureID), isRotating(false), rotateDir(1)
+Cube::Cube(GLuint textureID) : _horizontalAngle(0), _verticalAngle(0), _textureID(textureID), isRotating(false), rotateDir(1), scrollDir(1.0f)
 {
 	_textureOffset = 0.0f;
 }
@@ -9,15 +9,14 @@ Cube::Cube(GLuint textureID) : _horizontalAngle(0), _verticalAngle(0), _textureI
 void Cube::Update(float dt, bool isRotating, int rotateDir)
 {
 	_horizontalAngle += 90.0f * dt;
-	_textureOffset += 0.1f * dt;
-	//if (_textureOffset > 1.0f) {
-	if(_textureOffset > 0.6f){
-		//_textureOffset -= 1.0f;
-		_textureOffset -= 0.6f;
+	_textureOffset += 0.1f * dt*scrollDir;
+	if(_textureOffset > 0.6f || _textureOffset <=0.0f){
+		scrollDir *= -1.0f;
 	}
-	if (isRotating) {
-		_verticalAngle += 90.0f*dt;
-	}
+	this->isRotating = isRotating;
+	this->rotateDir = rotateDir;
+	_verticalAngle += 90.0f*dt;
+
 }
 
 void Cube::Draw(GLenum mode)
@@ -29,7 +28,6 @@ void Cube::Draw(GLenum mode)
 	float topT = 0.25f;
 	float bottomT = 0.75f;
 
-	//glBindTexture(GL_TEXTURE_2D, _textureID);
 	GLenum error = glGetError();
 
 	glPushMatrix();

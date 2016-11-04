@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML\OpenGL.hpp>
+
 #include "cube.h"
 
 int main(int argc, char *argv)
@@ -9,8 +10,8 @@ int main(int argc, char *argv)
 	sf::Image cubeImage;
 	cubeImage.loadFromFile("res/walltexture.jpg");
 
-	sf::Texture treeTexture;
-	treeTexture.loadFromFile("res/tree.jpg");
+	sf::Image bgImage;
+	bgImage.loadFromFile("res/skyrs.jpg");
 
 	glEnable(GL_TEXTURE_2D);
 
@@ -28,6 +29,7 @@ int main(int argc, char *argv)
 	GLuint cubeTextureID;
 	glGenTextures(1, &cubeTextureID);
 
+
 	glBindTexture(GL_TEXTURE_2D, cubeTextureID);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.getSize().x, cubeImage.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
@@ -39,6 +41,20 @@ int main(int argc, char *argv)
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	GLuint bgTextureID;
+	glGenTextures(1, &bgTextureID);
+	glBindTexture(GL_TEXTURE_2D, bgTextureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bgImage.getSize().x, bgImage.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		bgImage.getPixelsPtr()
+	);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 
 	float positionZ = 0.5f;
 	float angle = 0.0f;
@@ -91,26 +107,27 @@ int main(int argc, char *argv)
 
 		GLenum error = glGetError();
 
-		float offset = 0.25f;
+		//float offset = 0.25f;
+		float offset = 1.0f;
 		angle += 90.0f * deltaTime;
 
 		//draw stuff
 		GLfloat position[] = { positionZ, -0.1, positionZ, 0.0f };
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
 
-		cube.Update(deltaTime, isRotating, rotateDir);
+		//draw background
+		glBindTexture(GL_TEXTURE_2D, bgTextureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bgImage.getSize().x, bgImage.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			bgImage.getPixelsPtr()
+		);
+		glPushMatrix();
 
-		cube.Draw(mode);
+		glBegin(GL_QUADS);
 
-/*		glPushMatrix();
-		
-
-		glBegin(mode);
-
-		float leftS = 0.3f;
-		float rightS = 0.7f;
-		float topT = 0.25f;
-		float bottomT = 0.75f;
+		float leftS = 0.0f;
+		float rightS = 1.0f;
+		float topT = 0.0f;
+		float bottomT = 1.0f;
 
 		// Front
 		glColor3f(1.0f, 0.0f, 0.0f);
@@ -130,100 +147,18 @@ int main(int argc, char *argv)
 		glNormal3f(0.0f, 0.0f, 1.0f);
 		glVertex3f(offset, -offset, offset);
 
-		// Right
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glTexCoord2f(leftS, bottomT);
-		glNormal3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(offset, -offset, offset);
-
-		glTexCoord2f(leftS, topT);
-		glNormal3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(offset, offset, offset);
-
-		glTexCoord2f(rightS, topT);
-		glNormal3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(offset, offset, -offset);
-
-		glTexCoord2f(rightS, bottomT);
-		glNormal3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(offset, -offset, -offset);
-
-		// Left
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glTexCoord2f(leftS, bottomT);
-		glNormal3f(-1.0f, 0.0f, 0.0f);
-		glVertex3f(-offset, -offset, -offset);
-
-		glTexCoord2f(leftS, topT);
-		glNormal3f(-1.0f, 0.0f, 0.0f);
-		glVertex3f(-offset, offset, -offset);
-
-		glTexCoord2f(rightS, topT);
-		glNormal3f(-1.0f, 0.0f, 0.0f);
-		glVertex3f(-offset, offset, offset);
-
-		glTexCoord2f(rightS, bottomT);
-		glNormal3f(-1.0f, 0.0f, 0.0f);
-		glVertex3f(-offset, -offset, offset);
-
-		// Back
-		glColor3f(0.0f, 1.0f, 1.0f);
-		glTexCoord2f(leftS, bottomT);
-		glNormal3f(0.0f, 0.0f, -1.0f);
-		glVertex3f(offset, -offset, -offset);
-
-		glTexCoord2f(leftS, topT);
-		glNormal3f(0.0f, 0.0f, -1.0f);
-		glVertex3f(offset, offset, -offset);
-
-		glTexCoord2f(rightS, topT);
-		glNormal3f(0.0f, 0.0f, -1.0f);
-		glVertex3f(-offset, offset, -offset);
-
-		glTexCoord2f(rightS, bottomT);
-		glNormal3f(0.0f, 0.0f, -1.0f);
-		glVertex3f(-offset, -offset, -offset);
-
-		// Top
-		glColor3f(1.0f, 0.0f, 1.0f);
-		glTexCoord2f(leftS, bottomT);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-offset, offset, offset);
-
-		glTexCoord2f(leftS, topT);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-offset, offset, -offset);
-
-		glTexCoord2f(rightS, topT);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(offset, offset, -offset);
-
-		glTexCoord2f(rightS, bottomT);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(offset, offset, offset);
-
-		// Bottom
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glTexCoord2f(leftS, bottomT);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(-offset, -offset, -offset);
-
-		glTexCoord2f(leftS, topT);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(-offset, -offset, offset);
-
-		glTexCoord2f(rightS, topT);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(offset, -offset, offset);
-
-		glTexCoord2f(rightS, bottomT);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(offset, -offset, -offset);
-
-		// End our drawing block.
 		glEnd();
 
-		glPopMatrix();*/
+		glPushMatrix();
+		//draw cube
+		glBindTexture(GL_TEXTURE_2D, cubeTextureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.getSize().x, cubeImage.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			cubeImage.getPixelsPtr()
+		);
+		cube.Update(deltaTime, isRotating, rotateDir);
+		cube.Draw(mode);
+
+
 
 		window.display();
 	}

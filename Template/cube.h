@@ -18,4 +18,5 @@ private:
 	float _textureOffset;
 	bool isRotating;
 	int rotateDir;
+	float scrollDir;
 };
