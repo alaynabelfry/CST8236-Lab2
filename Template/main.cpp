@@ -1,12 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML\OpenGL.hpp>
+#include "cube.h"
 
 int main(int argc, char *argv)
 {
 	sf::RenderWindow window(sf::VideoMode(400, 400), "Template", sf::Style::Titlebar | sf::Style::Close);
 
-	sf::Image castleImage;
-	castleImage.loadFromFile("res/castle.jpg");
+	sf::Image cubeImage;
+	cubeImage.loadFromFile("res/walltexture.jpg");
 
 	sf::Texture treeTexture;
 	treeTexture.loadFromFile("res/tree.jpg");
@@ -24,13 +25,13 @@ int main(int argc, char *argv)
 
 	glFrontFace(GL_CW);
 
-	GLuint castleTextureID;
-	glGenTextures(1, &castleTextureID);
+	GLuint cubeTextureID;
+	glGenTextures(1, &cubeTextureID);
 
-	glBindTexture(GL_TEXTURE_2D, castleTextureID);
+	glBindTexture(GL_TEXTURE_2D, cubeTextureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, castleImage.getSize().x, castleImage.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-		castleImage.getPixelsPtr()
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.getSize().x, cubeImage.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		cubeImage.getPixelsPtr()
 	);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -46,6 +47,7 @@ int main(int argc, char *argv)
 	bool isRotating = false;
 	sf::Event evt;
 	sf::Clock appTimer;
+	Cube cube = Cube(cubeTextureID);
 	while (window.isOpen()) {
 
 		float deltaTime = appTimer.restart().asSeconds();
@@ -96,11 +98,12 @@ int main(int argc, char *argv)
 		GLfloat position[] = { positionZ, -0.1, positionZ, 0.0f };
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
 
-		glPushMatrix();
-		glRotatef(angle, 0.0f, 1.0f, 0.0f); // y axis rotate
-		if (isRotating) {
-			glRotatef(angle, 1.0f*rotateDir, 0.0f, 0.0f); //x axis rotate
-		}
+		cube.Update(deltaTime, isRotating, rotateDir);
+
+		cube.Draw(mode);
+
+/*		glPushMatrix();
+		
 
 		glBegin(mode);
 
@@ -220,7 +223,7 @@ int main(int argc, char *argv)
 		// End our drawing block.
 		glEnd();
 
-		glPopMatrix();
+		glPopMatrix();*/
 
 		window.display();
 	}
